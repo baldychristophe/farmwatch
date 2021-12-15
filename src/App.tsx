@@ -1,26 +1,27 @@
-import React from 'react'
-import logo from './logo.svg'
+import React, { useState } from 'react'
+
+import { Landing } from './pages/Landing'
+
 import './App.scss'
 
-function App() {
+export const App = () => {
+  const [userWalletAddress, setUserWalletAddress] = useState('')
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg-zinc-900">
+      <div className="container mx-auto min-h-screen">
+        { !userWalletAddress ?
+          <Landing
+            setUserWalletAddress={ setUserWalletAddress }
+          />
+          :
+          <div className="text-white">
+            Wallet Address { userWalletAddress }
+          </div>
+
+        }
+
+      </div>
     </div>
   )
 }
-
-export default App
