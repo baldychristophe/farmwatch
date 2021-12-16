@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import { Landing } from './pages/Landing'
+import { Portfolio } from './pages/Portfolio'
 
 import './App.scss'
 
@@ -15,10 +16,7 @@ export const App = () => {
             setUserWalletAddress={ setUserWalletAddress }
           />
           :
-          <div className="text-white">
-            Wallet Address { userWalletAddress }
-          </div>
-
+          <Portfolio userWalletAddress={ userWalletAddress } />
         }
 
       </div>

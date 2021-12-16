@@ -1,5 +1,6 @@
 .farmwatch-gradient {
   background: -webkit-linear-gradient(#67E8F9, #1E3A8A);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
