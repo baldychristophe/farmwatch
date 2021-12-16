@@ -10,23 +10,27 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
           <div className="mb-10">
             <h1 className="text-7xl font-light text-center tracking-wider farmwatch-gradient">Farmwatch</h1>
           </div>
-          <div className="columns-1 mx-auto w-full flex">
-            <input
-              ref={ inputRef }
-              type="text"
-              className="outline-none w-full px-3 rounded"
-              placeholder="Please enter your BEP20 wallet address"
-            />
-            <button
-              className="text-white p-1 border border-white ml-3 material-icons rounded"
-              onClick={ () => {
-                if (inputRef && inputRef.current) {
-                  props.setUserWalletAddress(inputRef.current.value)
-                }
-              }}
-            >
-              search
-            </button>
+
+          <div>
+            <form className="columns-1 mx-auto w-full flex">
+
+              <input
+                ref={ inputRef }
+                type="text"
+                className="outline-none w-full px-3 rounded"
+                placeholder="Please enter your BEP20 wallet address"
+              />
+              <button
+                className="text-white p-1 border border-white ml-3 material-icons rounded"
+                onClick={ () => {
+                  if (inputRef && inputRef.current) {
+                    props.setUserWalletAddress(inputRef.current.value)
+                  }
+                }}
+              >
+                search
+              </button>
+            </form>
           </div>
         </div>
       </div>
