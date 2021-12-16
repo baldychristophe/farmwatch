@@ -9,7 +9,7 @@ export const App = () => {
   const [userWalletAddress, setUserWalletAddress] = useState('')
 
   return (
-    <div className="bg-zinc-900">
+    <div className="bg-zinc-800">
       <div className="container mx-auto min-h-screen">
         { !userWalletAddress ?
           <Landing
