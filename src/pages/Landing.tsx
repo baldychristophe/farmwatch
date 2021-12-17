@@ -17,7 +17,7 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
               <input
                 ref={ inputRef }
                 type="text"
-                className="outline-none w-full px-3 rounded"
+                className="outline-none w-full px-3 rounded w-[26rem]"
                 placeholder="Please enter your BEP20 wallet address"
               />
               <button
