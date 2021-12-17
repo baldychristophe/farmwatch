@@ -1,8 +1,7 @@
-import { BigNumber } from 'ethers'
-import { utils } from 'ethers'
 import React, { useState, useEffect } from 'react'
+import { BigNumber, utils } from 'ethers'
 
-import { getBalance } from '../ethers'
+import { getBalance } from '../connectors'
 
 export const Portfolio = (props: { userWalletAddress: string }) => {
   const [balance, setBalance] = useState('')
