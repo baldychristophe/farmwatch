@@ -16,7 +16,7 @@ export const App = () => {
             setUserWalletAddress={ setUserWalletAddress }
           />
           :
-          <Portfolio userWalletAddress={ userWalletAddress } />
+          <Portfolio userWalletAddress={ userWalletAddress } setUserWalletAddress={ setUserWalletAddress } />
         }
 
       </div>
