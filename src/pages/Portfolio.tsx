@@ -110,14 +110,14 @@ export const Portfolio = (props: {
             { activePools.map((pool: any) => (
               <div key={ pool.index } className="basis-4/12 text-white border border-sky-600 p-4">
                 <div className="text-lg">{ pool.poolName }</div>
-                <div className="text-lg">{ pool.token0.name }/{ pool.token1.name }</div>
+                <div className="text-base">{ pool.token0.symbol } / { pool.token1.symbol }</div>
                 <div>${ poolNetWorth(pool) }</div>
                 <div className="text-gray-400 text-sm">
                   { Number(utils.formatEther(pool.poolInfo.amount)).toFixed(2) } { pool.symbol }
                 </div>
-                <div>
+                <div className="text-gray-400 text-sm">
                   <span>{ Number(utils.formatEther(pool.token0.balance)).toFixed(3) } { pool.token0.symbol }</span>
-                  <span>/</span>
+                  <span> / </span>
                   <span>{ Number(utils.formatEther(pool.token1.balance)).toFixed(3) } { pool.token1.symbol }</span>
                 </div>
               </div>
