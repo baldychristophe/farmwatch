@@ -74,7 +74,7 @@ export const Portfolio = (props: {
               <div key={ pool.index } className="basis-4/12 text-white border border-sky-600 p-4">
                 <div className="text-lg">{ pool.poolName }</div>
                 <div className="text-base">{ pool.token0.symbol } / { pool.token1.symbol }</div>
-                {/* <div>${ poolNetWorth(pool) }</div> */}
+                <div>${ (pool.token0.value + pool.token1.value).toFixed(2) }</div>
                 <div className="text-gray-400 text-sm">
                   { Number(utils.formatEther(pool.poolInfo.amount)).toFixed(2) } { pool.symbol }
                 </div>

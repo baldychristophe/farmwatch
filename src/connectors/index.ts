@@ -105,16 +105,18 @@ export const getMistSwapSummary = async (userAddress: string) => {
     const Token0Contract = new Contract(token0, UniswapV2ERC20ABI, activeProvider)
     const Token1Contract = new Contract(token1, UniswapV2ERC20ABI, activeProvider)
     const [
-      token0Name, token0Symbol, token0Balance,
-      token1Name, token1Symbol, token1Balance,
+      token0Name, token0Symbol, token0Balance, token0Price,
+      token1Name, token1Symbol, token1Balance, token1Price,
     ] = await Promise.all([
       Token0Contract.name(),
       Token0Contract.symbol(),
       Token0Contract.balanceOf(poolDetails.lpToken),
+      getTokenPriceUSD(token0),
 
       Token1Contract.name(),
       Token1Contract.symbol(),
       Token1Contract.balanceOf(poolDetails.lpToken),
+      getTokenPriceUSD(token1),
     ])
 
     return {
@@ -128,12 +130,16 @@ export const getMistSwapSummary = async (userAddress: string) => {
         name: token0Name,
         symbol: token0Symbol,
         balance: pool.poolInfo.amount.mul(token0Balance).div(totalSupply),
+        price: token0Price,
+        value: Number(utils.formatEther(pool.poolInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
       },
       token1: {
         address: token1,
         name: token1Name,
         symbol: token1Symbol,
         balance: pool.poolInfo.amount.mul(token1Balance).div(totalSupply),
+        price: token1Price,
+        value: Number(utils.formatEther(pool.poolInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
       },
     }
   }))
@@ -141,23 +147,10 @@ export const getMistSwapSummary = async (userAddress: string) => {
   return activePoolsWithDetails
 }
 
-export const poolNetWorth = async (pool: any) => {
-  const [ priceToken0, priceToken1 ] = await Promise.all([
-    getTokenPriceUSD(pool.token0.address),
-    getTokenPriceUSD(pool.token1.address),
-  ])
-  return Number(
-    (Number(utils.formatEther(pool.token0.balance)) * Number(priceToken0))
-    +
-    (Number(utils.formatEther(pool.token1.balance)) * Number(priceToken1))
-  ).toFixed(2)
-}
-
-const totalPoolsNetWorth = async (pools: any): Promise<number> => {
+const totalPoolsNetWorth = (pools: any): number => {
   let accumaltionValue = 0
   for (const pool of pools) {
-    const poolWorth = await poolNetWorth(pool)
-    accumaltionValue += Number(poolWorth)
+    accumaltionValue += pool.token0.value + pool.token1.value
   }
   return accumaltionValue
 }
@@ -176,7 +169,7 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
     getMistSwapSummary(userAddress),
   ])
 
-  const totalPools = await totalPoolsNetWorth(mistSwapSummary)
+  const totalPools = totalPoolsNetWorth(mistSwapSummary)
   console.log('total pool worth', totalPools)
 
   const netWorth = Number(
