@@ -64,14 +64,12 @@ export const Portfolio = (props: {
         </div>
       </div>
 
-      { portfolioSummary &&
+      { portfolioSummary && portfolioSummary.dexList.map((dex: any) => (
         <div className="w-full border border-sky-600 rounded p-4 mt-5">
-          <div className="text-white text-2xl mb-4">
-            Mistswap
-          </div>
+          <div className="text-white text-2xl mb-4">{ dex.name }</div>
           <div className="flex flex-row gap-4">
-            { portfolioSummary.dexList.map((pool: any) => (
-              <div key={ pool.index } className="basis-4/12 text-white border border-sky-600 p-4">
+            { dex.pools.map((pool: any) => (
+              <div key={ pool.index } className="basis-4/12 text-white border rounded border-sky-600 p-4">
                 <div className="text-lg">{ pool.poolName }</div>
                 <div className="text-base">{ pool.token0.symbol } / { pool.token1.symbol }</div>
                 <div>${ (pool.token0.value + pool.token1.value).toFixed(2) }</div>
@@ -87,7 +85,7 @@ export const Portfolio = (props: {
             )) }
           </div>
         </div>
-      }
+      ))}
     </>
   )
 }

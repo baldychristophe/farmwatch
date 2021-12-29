@@ -179,7 +179,7 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
   )
 
   return {
-    dexList: mistSwapSummary,
+    dexList: [{ name: 'Mistswap', pools: mistSwapSummary }],
     balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
     BCHPrice: BCHPrice,
     netWorth: netWorth,
