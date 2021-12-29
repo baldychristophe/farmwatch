@@ -44,14 +44,16 @@ export const getMISTPriceUSD = async () => {
     FLEXUSDContract.balanceOf(LPTOKEN_MIST_FLEXUSD_ADDRESS),
   ])
 
-  return (Number(utils.formatEther(balanceOfFlexUSD)) / Number(utils.formatEther(balanceOfMIST))).toFixed(3)
+  return Number(utils.formatEther(balanceOfFlexUSD)) / Number(utils.formatEther(balanceOfMIST))
 }
 
 export const getTokenPriceUSD = async (tokenAddress: string) => {
   if (tokenAddress === WBCH_ADDRESS) {
-    return getBCHPriceUSD()
+    const ret = await getBCHPriceUSD()
+    return ret.toNumber()
   } else if (tokenAddress === MIST_ADDRESS) {
-    return getMISTPriceUSD()
+    const ret = await getMISTPriceUSD()
+    return ret
   } else if (tokenAddress === FLEXUSD_ADDRESS) {
     return 1
   }
@@ -137,4 +139,56 @@ export const getMistSwapSummary = async (userAddress: string) => {
   }))
   console.log(activePoolsWithDetails)
   return activePoolsWithDetails
+}
+
+export const poolNetWorth = async (pool: any) => {
+  const [ priceToken0, priceToken1 ] = await Promise.all([
+    getTokenPriceUSD(pool.token0.address),
+    getTokenPriceUSD(pool.token1.address),
+  ])
+  return Number(
+    (Number(utils.formatEther(pool.token0.balance)) * Number(priceToken0))
+    +
+    (Number(utils.formatEther(pool.token1.balance)) * Number(priceToken1))
+  ).toFixed(2)
+}
+
+const totalPoolsNetWorth = async (pools: any): Promise<number> => {
+  let accumaltionValue = 0
+  for (const pool of pools) {
+    const poolWorth = await poolNetWorth(pool)
+    accumaltionValue += Number(poolWorth)
+  }
+  return accumaltionValue
+}
+
+export interface IPortfolioSummary {
+  netWorth: number,
+  balance: number,
+  BCHPrice: number,
+  dexList: Array<any>,
+}
+
+export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfolioSummary> => {
+  const [ userWalletBalance, BCHPrice, mistSwapSummary ] = await Promise.all([
+    getBalance(userAddress),
+    getTokenPriceUSD('0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'), // WBCH
+    getMistSwapSummary(userAddress),
+  ])
+
+  const totalPools = await totalPoolsNetWorth(mistSwapSummary)
+  console.log('total pool worth', totalPools)
+
+  const netWorth = Number(
+    totalPools
+    +
+    Number(utils.formatEther(userWalletBalance)) * BCHPrice
+  )
+
+  return {
+    dexList: mistSwapSummary,
+    balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
+    BCHPrice: BCHPrice,
+    netWorth: netWorth,
+  }
 }
