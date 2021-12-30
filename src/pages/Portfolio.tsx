@@ -49,7 +49,7 @@ export const Portfolio = (props: {
       </div>
 
       { portfolioSummary && portfolioSummary.dexList.map((dex: any) => (
-        <div className="w-full border border-sky-600 rounded p-4 mt-5">
+        <div className="w-full border border-sky-600 rounded p-4 mt-5" key={ dex.name }>
           <div className="text-white text-2xl mb-4">{ dex.name }</div>
           <div className="flex flex-row gap-4">
             { dex.pools.map((pool: any) => (
