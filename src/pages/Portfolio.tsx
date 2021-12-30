@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react'
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react'
 import { utils } from 'ethers'
 
+
+import { WalletAddressInput } from '../components/WalletAddressInput'
 import { getPortfolioSummary, IPortfolioSummary } from '../connectors'
 
 export const Portfolio = (props: {
@@ -8,8 +10,6 @@ export const Portfolio = (props: {
   setUserWalletAddress: Dispatch<SetStateAction<string>>
 }) => {
   const [portfolioSummary, setPortfolioSummary] = useState(null as null | IPortfolioSummary)
-
-  const inputRef = useRef(null as any)
 
   useEffect(() => {
     getPortfolioSummary(props.userWalletAddress).then((response) => setPortfolioSummary(response))
@@ -22,27 +22,11 @@ export const Portfolio = (props: {
         <div>
           <h1 className="text-3xl font-light tracking-wider farmwatch-gradient">Farmwatch</h1>
         </div>
-        <div className="ml-5">
-          <form className="columns-1 mx-auto w-full flex">
-            <input
-              ref={ inputRef }
-              type="text"
-              className="outline-none w-full px-3 rounded w-[26rem]"
-              placeholder="Please enter your BEP20 wallet address"
-              value={ props.userWalletAddress }
-              readOnly={ true }
-            />
-            <button
-              className="text-white p-1 border border-white ml-3 material-icons rounded"
-              onClick={ () => {
-                if (inputRef && inputRef.current) {
-                  props.setUserWalletAddress(inputRef.current.value)
-                }
-              }}
-            >
-              search
-            </button>
-          </form>
+        <div className="ml-5 columns-1 mx-auto w-full">
+          <WalletAddressInput
+            userWalletAddress={ props.userWalletAddress }
+            setUserWalletAddress={ props.setUserWalletAddress }
+          />
         </div>
       </div>
 

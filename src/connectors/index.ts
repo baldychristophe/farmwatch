@@ -170,7 +170,6 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
   ])
 
   const totalPools = totalPoolsNetWorth(mistSwapSummary)
-  console.log('total pool worth', totalPools)
 
   const netWorth = Number(
     totalPools

@@ -1,8 +1,8 @@
-import React, { useRef, Dispatch, SetStateAction } from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
+
+import { WalletAddressInput } from '../components/WalletAddressInput'
 
 export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<string>> }) => {
-  const inputRef = useRef(null as any)
-
   return (
     <div className="flex justify-center">
       <div className="absolute top-1/3 border border-white rounded-xl py-10 px-32">
@@ -11,26 +11,8 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
             <h1 className="text-7xl font-light text-center tracking-wider farmwatch-gradient">Farmwatch</h1>
           </div>
 
-          <div>
-            <form className="columns-1 mx-auto w-full flex">
-
-              <input
-                ref={ inputRef }
-                type="text"
-                className="outline-none w-full px-3 rounded w-[26rem]"
-                placeholder="Please enter your BEP20 wallet address"
-              />
-              <button
-                className="text-white p-1 border border-white ml-3 material-icons rounded"
-                onClick={ () => {
-                  if (inputRef && inputRef.current) {
-                    props.setUserWalletAddress(inputRef.current.value)
-                  }
-                }}
-              >
-                search
-              </button>
-            </form>
+          <div className="columns-1 mx-auto w-full">
+            <WalletAddressInput setUserWalletAddress={ props.setUserWalletAddress } />
           </div>
         </div>
       </div>
