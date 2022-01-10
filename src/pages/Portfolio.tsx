@@ -3,7 +3,8 @@ import { utils } from 'ethers'
 
 
 import { WalletAddressInput } from '../components/WalletAddressInput'
-import { getPortfolioSummary, IPortfolioSummary } from '../connectors'
+import { getPortfolioSummary } from '../connectors'
+import { IPortfolioSummary } from '../connectors/types'
 
 export const Portfolio = (props: {
   userWalletAddress: string,
