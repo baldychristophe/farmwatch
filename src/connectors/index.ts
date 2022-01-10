@@ -1,6 +1,8 @@
 import { getDefaultProvider, Contract } from 'ethers'
 import { BigNumber, utils } from 'ethers'
 
+import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
+
 const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
 const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
@@ -11,7 +13,7 @@ const WBCH_ADDRESS = '0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'
 const FLEXUSD_ADDRESS = '0x7b2B3C5308ab5b2a1d9a94d20D35CCDf61e05b72'
 const MIST_ADDRESS = '0x5fA664f69c2A4A3ec94FaC3cBf7049BD9CA73129'
 
-const MISTSWAP_MASTERCHEF_ADDRESS = '0x3A7B9D0ed49a90712da4E087b17eE4Ac1375a5D4'
+// const MISTSWAP_MASTERCHEF_ADDRESS = '0x3A7B9D0ed49a90712da4E087b17eE4Ac1375a5D4'
 const LPTOKEN_WBCH_FLEXUSD_ADDRESS = '0x24f011f12Ea45AfaDb1D4245bA15dCAB38B43D13'
 const LPTOKEN_MIST_FLEXUSD_ADDRESS = '0x437E444365aD9ed788e8f255c908bceAd5AEA645'
 
@@ -63,7 +65,7 @@ export const getTokenPriceUSD = async (tokenAddress: string) => {
 
 export const getActiveMistSwapPools = async (userAddress: string) => {
   const activeProvider = provider()
-  const masterChefContract = new Contract(MISTSWAP_MASTERCHEF_ADDRESS, MasterChefV2ABI, activeProvider)
+  const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   const poolLength = await masterChefContract.poolLength()
 
   const poolInfos = await Promise.all(
@@ -78,7 +80,7 @@ export const getActiveMistSwapPools = async (userAddress: string) => {
 
 export const getPoolDetails = (poolIndex: number) => {
   const activeProvider = provider()
-  const masterChefContract = new Contract(MISTSWAP_MASTERCHEF_ADDRESS, MasterChefV2ABI, activeProvider)
+  const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   return masterChefContract.poolInfo(poolIndex)
 }
 
