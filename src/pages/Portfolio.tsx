@@ -6,6 +6,8 @@ import { WalletAddressInput } from '../components/WalletAddressInput'
 import { getPortfolioSummary } from '../connectors'
 import { IPortfolioSummary } from '../connectors/types'
 
+const BASE_LOGO_URL = 'https://assets.mistswap.fi/blockchains/smartbch/assets/'
+
 export const Portfolio = (props: {
   userWalletAddress: string,
   setUserWalletAddress: Dispatch<SetStateAction<string>>
@@ -51,13 +53,25 @@ export const Portfolio = (props: {
 
       { portfolioSummary && portfolioSummary.dexList.map((dex: any) => (
         <div className="w-full border border-sky-600 rounded p-4 mt-5" key={ dex.name }>
-          <div className="text-white text-2xl mb-4">{ dex.name }</div>
+          <div className="flex justify-start items-center mb-4">
+            <div className="w-12 mr-4"><img src={ dex.logoUrl } alt={ `${dex.name} logo` } /></div>
+            <div className="text-white text-2xl">{ dex.name }</div>
+          </div>
           <div className="flex flex-row gap-4">
             { dex.pools.map((pool: any) => (
               <div key={ pool.index } className="basis-4/12 text-white border rounded border-sky-600 p-4">
-                <div className="text-lg">{ pool.poolName }</div>
-                <div className="text-base">{ pool.token0.symbol } / { pool.token1.symbol }</div>
-                <div>${ (pool.token0.value + pool.token1.value).toFixed(2) }</div>
+                <div className="flex items-center mb-4">
+                  <div className="flex mr-4">
+                    <img className="w-12 h-12 rounded-xl mr-2" src={ `${BASE_LOGO_URL}${pool.token0.address}/logo.png` } alt={ `${pool.token0.name} logo` } />
+                    <img className="w-12 h-12 rounded-xl" src={ `${BASE_LOGO_URL}${pool.token1.address}/logo.png` } alt={ `${pool.token1.name} logo` } />
+                  </div>
+                  <div className="grow">
+                    <div className="text-sm">{ pool.poolName }</div>
+                    <div className="text-sm">{ pool.token0.symbol } / { pool.token1.symbol }</div>
+                    <div className="text-sm">${ (pool.token0.value + pool.token1.value).toFixed(2) }</div>
+                  </div>
+                </div>
+
                 <div className="text-gray-400 text-sm">
                   { Number(utils.formatEther(pool.poolInfo.amount)).toFixed(2) } { pool.symbol }
                 </div>

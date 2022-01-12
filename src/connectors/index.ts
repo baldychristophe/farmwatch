@@ -36,7 +36,11 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
   )
 
   return {
-    dexList: [{ name: 'Mistswap', pools: mistSwapSummary }],
+    dexList: [{
+      name: 'Mistswap',
+      pools: mistSwapSummary,
+      logoUrl: 'https://assets.mistswap.fi/blockchains/smartbch/assets/0x5fA664f69c2A4A3ec94FaC3cBf7049BD9CA73129/logo.png',
+    }],
     balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
     BCHPrice: BCHPrice,
     netWorth: netWorth,
