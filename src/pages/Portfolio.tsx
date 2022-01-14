@@ -53,7 +53,7 @@ export const Portfolio = (props: {
 
       { portfolioSummary && portfolioSummary.dexList.map((dex: any) => (
         <div className="w-full border border-sky-600 rounded p-4 mt-5" key={ dex.name }>
-          <div className="flex justify-start items-center mb-4">
+          <div className="flex justify-start items-center mb-4 border-b border-gray-600 pb-4">
             <div className="w-12 mr-4"><img src={ dex.logoUrl } alt={ `${dex.name} logo` } /></div>
             <div className="text-white text-2xl">{ dex.name }</div>
           </div>
