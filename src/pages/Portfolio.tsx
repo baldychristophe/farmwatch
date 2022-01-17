@@ -23,7 +23,9 @@ export const Portfolio = (props: {
     <>
       <div className="py-2 flex">
         <div>
-          <h1 className="text-3xl font-light tracking-wider farmwatch-gradient">Farmwatch</h1>
+          <a href={ window.location.href }>
+            <h1 className="text-3xl font-light tracking-wider farmwatch-gradient">Farmwatch</h1>
+          </a>
         </div>
         <div className="ml-5 columns-1 mx-auto w-full">
           <WalletAddressInput
