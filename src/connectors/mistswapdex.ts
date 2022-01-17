@@ -3,60 +3,15 @@ import { BigNumber, utils } from 'ethers'
 
 import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
 
+import { getOrRefreshTokenPrice } from './store'
+
 const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
 const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
 
 const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
 
-const WBCH_ADDRESS = '0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'
-const FLEXUSD_ADDRESS = '0x7b2B3C5308ab5b2a1d9a94d20D35CCDf61e05b72'
-const MIST_ADDRESS = '0x5fA664f69c2A4A3ec94FaC3cBf7049BD9CA73129'
-
-const LPTOKEN_WBCH_FLEXUSD_ADDRESS = '0x24f011f12Ea45AfaDb1D4245bA15dCAB38B43D13'
-const LPTOKEN_MIST_FLEXUSD_ADDRESS = '0x437E444365aD9ed788e8f255c908bceAd5AEA645'
-
 export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
-
-export const getBCHPriceUSD = async () => {
-  const activeProvider = provider()
-  const BCHContract = new Contract(WBCH_ADDRESS, UniswapV2ERC20ABI, activeProvider)
-  const FLEXUSDContract = new Contract(FLEXUSD_ADDRESS, UniswapV2ERC20ABI, activeProvider)
-
-  const [ balanceOfBCH, balanceOfFlexUSD ] = await Promise.all([
-    BCHContract.balanceOf(LPTOKEN_WBCH_FLEXUSD_ADDRESS),
-    FLEXUSDContract.balanceOf(LPTOKEN_WBCH_FLEXUSD_ADDRESS),
-  ])
-
-  return balanceOfFlexUSD.div(balanceOfBCH)
-}
-
-export const getMISTPriceUSD = async () => {
-  const activeProvider = provider()
-  const MISTContract = new Contract(MIST_ADDRESS, UniswapV2ERC20ABI, activeProvider)
-  const FLEXUSDContract = new Contract(FLEXUSD_ADDRESS, UniswapV2ERC20ABI, activeProvider)
-
-  const [ balanceOfMIST, balanceOfFlexUSD ] = await Promise.all([
-    MISTContract.balanceOf(LPTOKEN_MIST_FLEXUSD_ADDRESS),
-    FLEXUSDContract.balanceOf(LPTOKEN_MIST_FLEXUSD_ADDRESS),
-  ])
-
-  return Number(utils.formatEther(balanceOfFlexUSD)) / Number(utils.formatEther(balanceOfMIST))
-}
-
-export const getTokenPriceUSD = async (tokenAddress: string) => {
-  if (tokenAddress === WBCH_ADDRESS) {
-    const ret = await getBCHPriceUSD()
-    return ret.toNumber()
-  } else if (tokenAddress === MIST_ADDRESS) {
-    const ret = await getMISTPriceUSD()
-    return ret
-  } else if (tokenAddress === FLEXUSD_ADDRESS) {
-    return 1
-  }
-  // Default value
-  return 1
-}
 
 export const getActiveMistSwapPools = async (userAddress: string) => {
   const activeProvider = provider()
@@ -108,12 +63,12 @@ export const getMistSwapSummary = async (userAddress: string) => {
       Token0Contract.name(),
       Token0Contract.symbol(),
       Token0Contract.balanceOf(poolDetails.lpToken),
-      getTokenPriceUSD(token0),
+      getOrRefreshTokenPrice(token0),
 
       Token1Contract.name(),
       Token1Contract.symbol(),
       Token1Contract.balanceOf(poolDetails.lpToken),
-      getTokenPriceUSD(token1),
+      getOrRefreshTokenPrice(token1),
     ])
 
     return {

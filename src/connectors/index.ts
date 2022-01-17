@@ -1,7 +1,8 @@
 import { getDefaultProvider } from 'ethers'
 import { BigNumber, utils } from 'ethers'
 
-import { getTokenPriceUSD, getMistSwapSummary } from './mistswapdex'
+import { getMistSwapSummary } from './mistswapdex'
+import { getOrRefreshTokenPrice } from './store'
 import { IPortfolioSummary } from './types'
 
 const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
@@ -23,7 +24,7 @@ const totalPoolsNetWorth = (pools: any): number => {
 export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfolioSummary> => {
   const [ userWalletBalance, BCHPrice, mistSwapSummary ] = await Promise.all([
     getBalance(userAddress),
-    getTokenPriceUSD('0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'), // WBCH
+    getOrRefreshTokenPrice('0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'), // WBCH
     getMistSwapSummary(userAddress),
   ])
 
