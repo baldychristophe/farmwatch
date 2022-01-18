@@ -59,9 +59,9 @@ export const Portfolio = (props: {
             <div className="w-12 mr-4"><img src={ dex.logoUrl } alt={ `${dex.name} logo` } /></div>
             <div className="text-white text-2xl">{ dex.name }</div>
           </div>
-          <div className="flex flex-row gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             { dex.pools.map((pool: any) => (
-              <div key={ pool.index } className="basis-4/12 text-white border rounded border-sky-600 p-4">
+              <div key={ pool.index } className="text-white border rounded border-sky-600 p-4">
                 <div className="flex items-center mb-4">
                   <div className="flex mr-4">
                     <img className="w-12 h-12 rounded-xl mr-2" src={ `${BASE_LOGO_URL}${pool.token0.address}/logo.png` } alt={ `${pool.token0.name} logo` } />
