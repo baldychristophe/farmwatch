@@ -8,7 +8,9 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
       <div className="absolute top-1/3 border border-white rounded-xl py-10 px-32">
         <div className="flex flex-col justify-center">
           <div className="mb-10">
-            <h1 className="text-7xl font-light text-center tracking-wider farmwatch-gradient">Farmwatch</h1>
+            <a href={ window.location.href }>
+              <h1 className="text-7xl font-light text-center tracking-wider farmwatch-gradient">Farmwatch</h1>
+            </a>
           </div>
 
           <div className="columns-1 mx-auto w-full">
