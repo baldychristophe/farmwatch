@@ -9,6 +9,8 @@ const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
 const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
 
+const MISTSWAP_LPTOKEN_DETAILS = require('../cache/mistswap/lptoken_details.json')
+
 const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
 
 export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
@@ -34,14 +36,16 @@ export const getPoolDetails = (poolIndex: number) => {
   return masterChefContract.poolInfo(poolIndex)
 }
 
-export const getV2PairSummary = (poolAddress: string) => {
+export const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, string]> => {
   const activeProvider = provider()
   const LPTokenPoolContract = new Contract(poolAddress, UniswapV2PairABI, activeProvider)
+  console.log('token details', MISTSWAP_LPTOKEN_DETAILS[poolAddress])
   return Promise.all([
-    LPTokenPoolContract.name(),
-    LPTokenPoolContract.token0(),
-    LPTokenPoolContract.token1(),
-    LPTokenPoolContract.symbol(),
+    // Use cache when possible
+    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].name : LPTokenPoolContract.name(),
+    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token0 : LPTokenPoolContract.token0(),
+    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token1 : LPTokenPoolContract.token1(),
+    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].symbol : LPTokenPoolContract.symbol(),
     LPTokenPoolContract.totalSupply(),
   ])
 }
