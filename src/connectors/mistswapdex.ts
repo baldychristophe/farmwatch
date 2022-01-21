@@ -3,7 +3,8 @@ import { BigNumber, utils } from 'ethers'
 
 import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
 
-import { getOrRefreshTokenPrice } from './store'
+import { getOrRefreshTokenPrice, getTokenPrice, setTokenPrice } from './store'
+import { WBCH_ADDRESS } from './addresses'
 
 const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
@@ -15,7 +16,49 @@ const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
 
 export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
 
-export const getActiveMistSwapPools = async (userAddress: string) => {
+const getTokenPriceInBenchmarkTokenFromLiquidityPool = async (tokenAddress: string, benchmarkTokenAddress: string, liquidityPoolAddress: string): Promise<number> => {
+  const activeProvider = provider()
+  const benchmarkContract = new Contract(benchmarkTokenAddress, UniswapV2ERC20ABI, activeProvider)
+  const tokenContract = new Contract(tokenAddress, UniswapV2ERC20ABI, activeProvider)
+
+  const [ balanceOfBenchmark, balanceOftoken ] = await Promise.all([
+    benchmarkContract.balanceOf(liquidityPoolAddress),
+    tokenContract.balanceOf(liquidityPoolAddress),
+  ])
+
+  return Number(utils.formatEther(balanceOftoken)) / Number(utils.formatEther(balanceOfBenchmark))
+}
+
+export const getTokenPriceFromPools = async (tokenAddress: string): Promise<number> => {
+  // Check the store first
+  const tokenPrice = getTokenPrice(tokenAddress)
+  if (tokenPrice) {
+    return tokenPrice
+  }
+  // Find the pools where the token is used
+  // Object entries convert dict to list
+  const poolsWithToken: any[] = Object.entries(MISTSWAP_LPTOKEN_DETAILS).filter(([_poolAddress, pool]: [string, any]) => pool.token0 === tokenAddress || pool.token1 === tokenAddress)
+  // Find if there is a pool with WBCH
+  const poolWithWBCH: any[] = poolsWithToken.filter(([_poolAddress, pool]: [string, any]) => pool.token0 === WBCH_ADDRESS || pool.token1 === WBCH_ADDRESS)
+  if (poolWithWBCH.length > 0) {
+    const tokenPriceInBCH = await getTokenPriceInBenchmarkTokenFromLiquidityPool(tokenAddress, WBCH_ADDRESS, poolWithWBCH[0][0])
+    const WBCHPriceInUSD = await getOrRefreshTokenPrice(WBCH_ADDRESS)
+    const tokenPriceInUSD = WBCHPriceInUSD / tokenPriceInBCH
+    setTokenPrice(tokenAddress, tokenPriceInUSD)
+    return tokenPriceInUSD
+  }
+  // Else recursively get the price of any token it shares a pool with
+  // Hope that this part does not get stuck in an infinite loop
+  const randomBenchmarkTokenAddress = poolsWithToken[0][1].token0 !== tokenAddress ? poolsWithToken[0][1].token0 : poolsWithToken[0][1].token1
+  const tokenPriceInRandomBenchmarkToken = await getTokenPriceInBenchmarkTokenFromLiquidityPool(tokenAddress, randomBenchmarkTokenAddress, poolsWithToken[0][0])
+  // Get the price in USD of the benchmark
+  const benchmarkPriceInUSD = await getTokenPriceFromPools(randomBenchmarkTokenAddress)
+  const tokenPriceInUSD = benchmarkPriceInUSD / tokenPriceInRandomBenchmarkToken
+  setTokenPrice(tokenAddress, tokenPriceInUSD)
+  return tokenPriceInUSD
+}
+
+const getActivePools = async (userAddress: string) => {
   const activeProvider = provider()
   const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   const poolLength = await masterChefContract.poolLength()
@@ -30,16 +73,15 @@ export const getActiveMistSwapPools = async (userAddress: string) => {
   )
 }
 
-export const getPoolDetails = (poolIndex: number) => {
+const getPoolDetails = (poolIndex: number) => {
   const activeProvider = provider()
   const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   return masterChefContract.poolInfo(poolIndex)
 }
 
-export const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, string]> => {
+const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, string]> => {
   const activeProvider = provider()
   const LPTokenPoolContract = new Contract(poolAddress, UniswapV2PairABI, activeProvider)
-  console.log('token details', MISTSWAP_LPTOKEN_DETAILS[poolAddress])
   return Promise.all([
     // Use cache when possible
     poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].name : LPTokenPoolContract.name(),
@@ -52,7 +94,7 @@ export const getV2PairSummary = (poolAddress: string): Promise<[string, string, 
 
 export const getMistSwapSummary = async (userAddress: string) => {
   const activeProvider = provider()
-  const activePools = await getActiveMistSwapPools(userAddress)
+  const activePools = await getActivePools(userAddress)
 
   const activePoolsWithDetails = await Promise.all(activePools.map(async (pool) => {
     let poolDetails = await getPoolDetails(pool.index)
@@ -67,12 +109,12 @@ export const getMistSwapSummary = async (userAddress: string) => {
       Token0Contract.name(),
       Token0Contract.symbol(),
       Token0Contract.balanceOf(poolDetails.lpToken),
-      getOrRefreshTokenPrice(token0),
+      getTokenPriceFromPools(token0),
 
       Token1Contract.name(),
       Token1Contract.symbol(),
       Token1Contract.balanceOf(poolDetails.lpToken),
-      getOrRefreshTokenPrice(token1),
+      getTokenPriceFromPools(token1),
     ])
 
     return {
