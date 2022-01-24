@@ -39,7 +39,7 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
   )
 
   return {
-    dexList: [{
+    exchanges: [{
       name: 'Mistswap',
       pools: mistSwapSummary,
       logoUrl: 'https://assets.mistswap.fi/blockchains/smartbch/assets/0x5fA664f69c2A4A3ec94FaC3cBf7049BD9CA73129/logo.png',
