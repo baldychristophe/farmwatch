@@ -1,10 +1,14 @@
+interface IPool {
+  
+}
+
 export interface IExchange {
   name: string,
   pools: Array<any>,
-  logoUrl: string,
   token: {
     name: string,
     price: number,
+    logoUrl: string,
   }
 }
 

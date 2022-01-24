@@ -4,7 +4,10 @@ import { BigNumber, utils } from 'ethers'
 import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
 
 import { getOrRefreshTokenPrice, getTokenPrice, setTokenPrice } from './store'
-import { WBCH_ADDRESS } from './addresses'
+import { WBCH_ADDRESS, MIST_ADDRESS } from './addresses'
+import { IExchange } from './types'
+
+const BASE_LOGO_URL = 'https://assets.mistswap.fi/blockchains/smartbch/assets'
 
 const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
@@ -36,7 +39,7 @@ export const getTokenPriceFromPools = async (tokenAddress: string): Promise<numb
     return tokenPrice
   }
   // Find the pools where the token is used
-  // Object entries convert dict to list
+  // Object entries convert dict to list [[key, value], [key, value], ...]
   const poolsWithToken: any[] = Object.entries(MISTSWAP_LPTOKEN_DETAILS).filter(([_poolAddress, pool]: [string, any]) => pool.token0 === tokenAddress || pool.token1 === tokenAddress)
   // Find if there is a pool with WBCH
   const poolWithWBCH: any[] = poolsWithToken.filter(([_poolAddress, pool]: [string, any]) => pool.token0 === WBCH_ADDRESS || pool.token1 === WBCH_ADDRESS)
@@ -58,7 +61,7 @@ export const getTokenPriceFromPools = async (tokenAddress: string): Promise<numb
   return tokenPriceInUSD
 }
 
-const getActivePools = async (userAddress: string) => {
+const getActivePools = async (userAddress: string): Promise<Array<{ poolUserInfo: { amount: BigNumber, rewardDebt: BigNumber }, index: number }>> => {
   const activeProvider = provider()
   const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   const poolLength = await masterChefContract.poolLength()
@@ -67,9 +70,9 @@ const getActivePools = async (userAddress: string) => {
     Array.from({ length: poolLength }, (_, poolIndex) => masterChefContract.userInfo(poolIndex, userAddress))
   )
   return poolInfos
-  .map((poolInfo, index) => ({ index, poolInfo })) // Add the index
+  .map((poolUserInfo, index) => ({ index, poolUserInfo })) // Add the index
   .filter(
-    (pool: { poolInfo: { amount: BigNumber, rewardDebt: BigNumber }, index: number }) => !pool.poolInfo.amount.isZero()
+    (pool: { poolUserInfo: { amount: BigNumber, rewardDebt: BigNumber }, index: number }) => !pool.poolUserInfo.amount.isZero()
   )
 }
 
@@ -79,7 +82,7 @@ const getPoolDetails = (poolIndex: number) => {
   return masterChefContract.poolInfo(poolIndex)
 }
 
-const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, string]> => {
+const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, number, string]> => {
   const activeProvider = provider()
   const LPTokenPoolContract = new Contract(poolAddress, UniswapV2PairABI, activeProvider)
   return Promise.all([
@@ -88,17 +91,20 @@ const getV2PairSummary = (poolAddress: string): Promise<[string, string, string,
     poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token0 : LPTokenPoolContract.token0(),
     poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token1 : LPTokenPoolContract.token1(),
     poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].symbol : LPTokenPoolContract.symbol(),
+    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].decimals : LPTokenPoolContract.decimals(),
     LPTokenPoolContract.totalSupply(),
   ])
 }
 
-export const getMistSwapSummary = async (userAddress: string) => {
+export const getMistSwapSummary = async (userAddress: string): Promise<IExchange> => {
   const activeProvider = provider()
   const activePools = await getActivePools(userAddress)
+  // Launch and forget, do it early to hope it will be cached in the store when required later
+  const MistPricePromise = getOrRefreshTokenPrice(MIST_ADDRESS)
 
   const activePoolsWithDetails = await Promise.all(activePools.map(async (pool) => {
     let poolDetails = await getPoolDetails(pool.index)
-    let [poolName, token0, token1, symbol, totalSupply] = await getV2PairSummary(poolDetails.lpToken)
+    let [poolName, token0, token1, symbol, decimals,totalSupply] = await getV2PairSummary(poolDetails.lpToken)
 
     const Token0Contract = new Contract(token0, UniswapV2ERC20ABI, activeProvider)
     const Token1Contract = new Contract(token1, UniswapV2ERC20ABI, activeProvider)
@@ -118,28 +124,40 @@ export const getMistSwapSummary = async (userAddress: string) => {
     ])
 
     return {
-      ...pool,
+      poolUserInfo: pool.poolUserInfo,
+      poolIndex: pool.index,
       poolDetails,
       poolName,
       symbol,
       totalSupply,
+      decimals,
       token0: {
         address: token0,
         name: token0Name,
         symbol: token0Symbol,
-        balance: pool.poolInfo.amount.mul(token0Balance).div(totalSupply),
+        balance: pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply),
         price: token0Price,
-        value: Number(utils.formatEther(pool.poolInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
+        value: Number(utils.formatEther(pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
+        logoUrl: `${BASE_LOGO_URL}/${token0}/logo.png`,
       },
       token1: {
         address: token1,
         name: token1Name,
         symbol: token1Symbol,
-        balance: pool.poolInfo.amount.mul(token1Balance).div(totalSupply),
+        balance: pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply),
         price: token1Price,
-        value: Number(utils.formatEther(pool.poolInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
+        value: Number(utils.formatEther(pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
+        logoUrl: `${BASE_LOGO_URL}/${token1}/logo.png`,
       },
     }
   }))
-  return activePoolsWithDetails
+  return {
+    name: 'Mistswap',
+    pools: activePoolsWithDetails,
+    token: {
+      name: 'Mist',
+      price: await MistPricePromise, // retrieve the launch and forget
+      logoUrl: `${BASE_LOGO_URL}/${MIST_ADDRESS}/logo.png`,
+    }
+  }
 }
