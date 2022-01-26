@@ -50,7 +50,7 @@ export const Portfolio = (props: {
         </div>
       </div>
 
-      { portfolioSummary && portfolioSummary.exchanges.map((exchange: any) => <Exchange exchange={ exchange } />)}
+      { portfolioSummary && portfolioSummary.exchanges.map((exchange: any) => <Exchange exchange={ exchange } key={ exchange.name } />)}
     </>
   )
 }
