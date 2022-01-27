@@ -3,6 +3,7 @@ import { utils } from 'ethers'
 
 import { UncontrolledTooltip } from './UncontrolledTooltip'
 import { IExchange } from '../connectors/types'
+import { displayCurrency, displayNumber } from '../numberUtils'
 
 export const Exchange = (props: { exchange: IExchange }) => {
   return (
@@ -17,7 +18,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
         />
         <UncontrolledTooltip target={ `${props.exchange.name}-logo` }>
           <div className="p-1">
-            { props.exchange.token.name } : { props.exchange.token.price.toLocaleString(undefined, { style: "currency", currency: 'USD' }) }
+            { props.exchange.token.name } : { displayCurrency(props.exchange.token.price) }
           </div>
         </UncontrolledTooltip>
         <div className="text-white text-2xl">{ props.exchange.name }</div>
@@ -35,7 +36,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
                 />
                 <UncontrolledTooltip target={ `${props.exchange.name}-pool-${pool.poolIndex}-${pool.token0.symbol}` }>
                   <div className="p-1">
-                    { pool.token0.name } : { pool.token0.price.toLocaleString(undefined, { style: "currency", currency: 'USD' }) }
+                    { pool.token0.name } : { displayCurrency(pool.token0.price) }
                   </div>
                 </UncontrolledTooltip>
                 <img
@@ -46,24 +47,24 @@ export const Exchange = (props: { exchange: IExchange }) => {
                 />
                 <UncontrolledTooltip target={ `${props.exchange.name}-pool-${pool.poolIndex}-${pool.token1.symbol}` }>
                   <div className="p-1">
-                  { pool.token1.name } : { pool.token1.price.toLocaleString(undefined, { style: "currency", currency: 'USD' }) }
+                  { pool.token1.name } : { displayCurrency(pool.token1.price) }
                   </div>
                 </UncontrolledTooltip>
               </div>
               <div className="grow">
                 <div className="text-sm">{ pool.poolName }</div>
                 <div className="text-sm">{ pool.token0.symbol } / { pool.token1.symbol }</div>
-                <div className="text-sm">${ (pool.token0.value + pool.token1.value).toFixed(2) }</div>
+                <div className="text-sm">{ displayCurrency(pool.token0.value + pool.token1.value) }</div>
               </div>
             </div>
 
             <div className="text-gray-400 text-sm">
-              { Number(utils.formatEther(pool.poolUserInfo.amount)).toFixed(2) } { pool.symbol }
+              { displayNumber(Number(utils.formatEther(pool.poolUserInfo.amount))) } { pool.symbol }
             </div>
             <div className="text-gray-400 text-sm">
-              <span>{ Number(utils.formatEther(pool.token0.balance)).toFixed(3) } { pool.token0.symbol }</span>
+              <span>{ displayNumber(Number(utils.formatEther(pool.token0.balance))) } { pool.token0.symbol }</span>
               <span> / </span>
-              <span>{ Number(utils.formatEther(pool.token1.balance)).toFixed(3) } { pool.token1.symbol }</span>
+              <span>{ displayNumber(Number(utils.formatEther(pool.token1.balance))) } { pool.token1.symbol }</span>
             </div>
           </div>
         )) }

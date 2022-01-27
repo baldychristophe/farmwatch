@@ -4,6 +4,7 @@ import { WalletAddressInput } from '../components/WalletAddressInput'
 import { Exchange } from '../components/Exchange'
 import { getPortfolioSummary } from '../connectors'
 import { IPortfolioSummary } from '../connectors/types'
+import { displayCurrency } from '../numberUtils'
 
 export const Portfolio = (props: {
   userWalletAddress: string,
@@ -37,7 +38,7 @@ export const Portfolio = (props: {
           <div className="text-xl farmwatch-gradient">Net Worth</div>
           { portfolioSummary &&
             <div className="text-3xl">
-              ${ portfolioSummary.netWorth.toFixed(2) }
+              { displayCurrency(portfolioSummary.netWorth) }
             </div>
           }
         </div>
@@ -45,7 +46,7 @@ export const Portfolio = (props: {
         <div className="text-white text-center basis-6/12 flex-col justify-center">
           <div className="text-xl farmwatch-gradient">Wallet Balance</div>
           { portfolioSummary &&
-            <div className="text-3xl">${ portfolioSummary.balance.toFixed(2) }</div>
+            <div className="text-3xl">{ displayCurrency(portfolioSummary.balance) }</div>
           }
         </div>
       </div>
