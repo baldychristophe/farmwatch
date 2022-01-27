@@ -24,12 +24,14 @@ const getTokenPriceInBenchmarkTokenFromLiquidityPool = async (tokenAddress: stri
   const benchmarkContract = new Contract(benchmarkTokenAddress, UniswapV2ERC20ABI, activeProvider)
   const tokenContract = new Contract(tokenAddress, UniswapV2ERC20ABI, activeProvider)
 
-  const [ balanceOfBenchmark, balanceOftoken ] = await Promise.all([
+  const [ balanceOfBenchmark, benchmarkDecimals, balanceOftoken, tokenDecimals ] = await Promise.all([
     benchmarkContract.balanceOf(liquidityPoolAddress),
+    benchmarkContract.decimals(),
     tokenContract.balanceOf(liquidityPoolAddress),
+    tokenContract.decimals(),
   ])
 
-  return Number(utils.formatEther(balanceOftoken)) / Number(utils.formatEther(balanceOfBenchmark))
+  return Number(utils.formatUnits(balanceOftoken, tokenDecimals)) / Number(utils.formatUnits(balanceOfBenchmark, benchmarkDecimals))
 }
 
 export const getTokenPriceFromPools = async (tokenAddress: string): Promise<number> => {
@@ -104,7 +106,7 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
 
   const activePoolsWithDetails = await Promise.all(activePools.map(async (pool) => {
     let poolDetails = await getPoolDetails(pool.index)
-    let [poolName, token0, token1, symbol, decimals,totalSupply] = await getV2PairSummary(poolDetails.lpToken)
+    let [poolName, token0, token1, symbol, decimals, totalSupply] = await getV2PairSummary(poolDetails.lpToken)
 
     const Token0Contract = new Contract(token0, UniswapV2ERC20ABI, activeProvider)
     const Token1Contract = new Contract(token1, UniswapV2ERC20ABI, activeProvider)
@@ -140,7 +142,7 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
         decimals: token0Decimals,
         balance: pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply),
         price: token0Price,
-        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
+        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply), token0Decimals)) * token0Price,
         logoUrl: `${BASE_LOGO_URL}/${token0}/logo.png`,
 
       },
@@ -151,7 +153,7 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
         decimals: token1Decimals,
         balance: pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply),
         price: token1Price,
-        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
+        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply), token1Decimals)) * token1Price,
         logoUrl: `${BASE_LOGO_URL}/${token1}/logo.png`,
       },
     }
