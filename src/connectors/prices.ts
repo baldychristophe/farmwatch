@@ -13,15 +13,14 @@ export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
 
 export const getBCHPriceUSD = async () => {
   const activeProvider = provider()
-  const BCHContract = new Contract(WBCH_ADDRESS, UniswapV2ERC20ABI, activeProvider)
+  const WBCHContract = new Contract(WBCH_ADDRESS, UniswapV2ERC20ABI, activeProvider)
   const FLEXUSDContract = new Contract(FLEXUSD_ADDRESS, UniswapV2ERC20ABI, activeProvider)
 
-  const [ balanceOfBCH, balanceOfFlexUSD ] = await Promise.all([
-    BCHContract.balanceOf(LPTOKEN_WBCH_FLEXUSD_ADDRESS),
+  const [ balanceOfWBCH, balanceOfFlexUSD ] = await Promise.all([
+    WBCHContract.balanceOf(LPTOKEN_WBCH_FLEXUSD_ADDRESS),
     FLEXUSDContract.balanceOf(LPTOKEN_WBCH_FLEXUSD_ADDRESS),
   ])
-
-  return balanceOfFlexUSD.div(balanceOfBCH)
+  return Number(utils.formatUnits(balanceOfFlexUSD, 18)) / Number(utils.formatUnits(balanceOfWBCH, 18))
 }
 
 export const getMISTPriceUSD = async () => {
@@ -40,7 +39,7 @@ export const getMISTPriceUSD = async () => {
 export const getTokenPriceUSD = async (tokenAddress: string) => {
   if (tokenAddress === WBCH_ADDRESS) {
     const ret = await getBCHPriceUSD()
-    return ret.toNumber()
+    return ret
   } else if (tokenAddress === MIST_ADDRESS) {
     const ret = await getMISTPriceUSD()
     return ret
