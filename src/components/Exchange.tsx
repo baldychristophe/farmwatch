@@ -59,12 +59,12 @@ export const Exchange = (props: { exchange: IExchange }) => {
             </div>
 
             <div className="text-gray-400 text-sm">
-              { displayNumber(Number(utils.formatEther(pool.poolUserInfo.amount))) } { pool.symbol }
+              { displayNumber(Number(utils.formatUnits(pool.poolUserInfo.amount, pool.decimals))) } { pool.symbol }
             </div>
             <div className="text-gray-400 text-sm">
-              <span>{ displayNumber(Number(utils.formatEther(pool.token0.balance))) } { pool.token0.symbol }</span>
+              <span>{ displayNumber(Number(utils.formatUnits(pool.token0.balance, pool.token0.decimals))) } { pool.token0.symbol }</span>
               <span> / </span>
-              <span>{ displayNumber(Number(utils.formatEther(pool.token1.balance))) } { pool.token1.symbol }</span>
+              <span>{ displayNumber(Number(utils.formatUnits(pool.token1.balance, pool.token1.decimals))) } { pool.token1.symbol }</span>
             </div>
           </div>
         )) }

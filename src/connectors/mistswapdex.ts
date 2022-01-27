@@ -109,16 +109,18 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
     const Token0Contract = new Contract(token0, UniswapV2ERC20ABI, activeProvider)
     const Token1Contract = new Contract(token1, UniswapV2ERC20ABI, activeProvider)
     const [
-      token0Name, token0Symbol, token0Balance, token0Price,
-      token1Name, token1Symbol, token1Balance, token1Price,
+      token0Name, token0Symbol, token0Decimals, token0Balance, token0Price,
+      token1Name, token1Symbol, token1Decimals, token1Balance, token1Price,
     ] = await Promise.all([
       Token0Contract.name(),
       Token0Contract.symbol(),
+      Token0Contract.decimals(),
       Token0Contract.balanceOf(poolDetails.lpToken),
       getTokenPriceFromPools(token0),
 
       Token1Contract.name(),
       Token1Contract.symbol(),
+      Token1Contract.decimals(),
       Token1Contract.balanceOf(poolDetails.lpToken),
       getTokenPriceFromPools(token1),
     ])
@@ -135,18 +137,21 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
         address: token0,
         name: token0Name,
         symbol: token0Symbol,
+        decimals: token0Decimals,
         balance: pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply),
         price: token0Price,
-        value: Number(utils.formatEther(pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
+        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token0Balance).div(totalSupply))) * token0Price,
         logoUrl: `${BASE_LOGO_URL}/${token0}/logo.png`,
+
       },
       token1: {
         address: token1,
         name: token1Name,
         symbol: token1Symbol,
+        decimals: token1Decimals,
         balance: pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply),
         price: token1Price,
-        value: Number(utils.formatEther(pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
+        value: Number(utils.formatUnits(pool.poolUserInfo.amount.mul(token1Balance).div(totalSupply))) * token1Price,
         logoUrl: `${BASE_LOGO_URL}/${token1}/logo.png`,
       },
     }
