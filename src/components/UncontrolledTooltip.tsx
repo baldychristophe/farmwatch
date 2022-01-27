@@ -1,6 +1,7 @@
 import React, { ReactElement, useEffect } from 'react'
-import tippy from 'tippy.js'
+import tippy, { roundArrow } from 'tippy.js'
 
+import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/themes/light.css'
 
 export const UncontrolledTooltip = (props: { target: string, children: ReactElement }) => {
@@ -11,9 +12,10 @@ export const UncontrolledTooltip = (props: { target: string, children: ReactElem
     tippy(target, {
       content: tooltip,
       allowHTML: true,
-      arrow: true,
+      arrow: roundArrow,
       theme: 'light',
       touch: true,
+      duration: 100,
     })
   }, [props.target, props.children])
   return (

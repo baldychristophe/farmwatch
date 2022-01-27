@@ -17,7 +17,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
           aria-describedby="tooltip"
         />
         <UncontrolledTooltip target={ `${props.exchange.name}-logo` }>
-          <div className="p-1">
+          <div className="p-1 text-sm">
             { props.exchange.token.name } : { displayCurrency(props.exchange.token.price) }
           </div>
         </UncontrolledTooltip>
@@ -35,7 +35,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
                   alt={ `${pool.token0.name} logo` }
                 />
                 <UncontrolledTooltip target={ `${props.exchange.name}-pool-${pool.poolIndex}-${pool.token0.symbol}` }>
-                  <div className="p-1">
+                  <div className="p-1 text-sm">
                     { pool.token0.name } : { displayCurrency(pool.token0.price) }
                   </div>
                 </UncontrolledTooltip>
@@ -46,7 +46,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
                   alt={ `${pool.token1.name} logo` }
                 />
                 <UncontrolledTooltip target={ `${props.exchange.name}-pool-${pool.poolIndex}-${pool.token1.symbol}` }>
-                  <div className="p-1">
+                  <div className="p-1 text-sm">
                   { pool.token1.name } : { displayCurrency(pool.token1.price) }
                   </div>
                 </UncontrolledTooltip>

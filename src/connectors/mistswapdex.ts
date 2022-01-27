@@ -155,7 +155,7 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
     name: 'Mistswap',
     pools: activePoolsWithDetails,
     token: {
-      name: 'Mist',
+      name: 'MistToken',
       price: await MistPricePromise, // retrieve the launch and forget
       logoUrl: `${BASE_LOGO_URL}/${MIST_ADDRESS}/logo.png`,
     }
