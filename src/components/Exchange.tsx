@@ -2,7 +2,7 @@ import React from 'react'
 import { utils } from 'ethers'
 
 import { UncontrolledTooltip } from './UncontrolledTooltip'
-import { IExchange } from '../connectors/types'
+import { IExchange, IPool } from '../connectors/types'
 import { displayCurrency, displayNumber } from '../numberUtils'
 
 export const Exchange = (props: { exchange: IExchange }) => {
@@ -24,7 +24,7 @@ export const Exchange = (props: { exchange: IExchange }) => {
         <div className="text-white text-2xl">{ props.exchange.name }</div>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        { props.exchange.pools.map((pool: any) => (
+        { props.exchange.pools.map((pool: IPool) => (
           <div key={ pool.poolIndex } className="text-white border rounded border-sky-600 p-4">
             <div className="flex items-center mb-4">
               <div className="flex mr-4">

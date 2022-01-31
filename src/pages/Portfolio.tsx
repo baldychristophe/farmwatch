@@ -3,7 +3,7 @@ import React, { useState, useEffect, Dispatch, SetStateAction } from 'react'
 import { WalletAddressInput } from '../components/WalletAddressInput'
 import { Exchange } from '../components/Exchange'
 import { getPortfolioSummary } from '../connectors'
-import { IPortfolioSummary } from '../connectors/types'
+import { IPortfolioSummary, IExchange } from '../connectors/types'
 import { displayCurrency } from '../numberUtils'
 
 export const Portfolio = (props: {
@@ -51,7 +51,7 @@ export const Portfolio = (props: {
         </div>
       </div>
 
-      { portfolioSummary && portfolioSummary.exchanges.map((exchange: any) => <Exchange exchange={ exchange } key={ exchange.name } />)}
+      { portfolioSummary && portfolioSummary.exchanges.map((exchange: IExchange) => <Exchange exchange={ exchange } key={ exchange.name } />)}
     </>
   )
 }

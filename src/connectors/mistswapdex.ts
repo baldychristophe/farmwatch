@@ -85,7 +85,7 @@ const getPoolDetails = (poolIndex: number) => {
   return masterChefContract.poolInfo(poolIndex)
 }
 
-const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, number, string]> => {
+const getV2PairSummary = (poolAddress: string): Promise<[string, string, string, string, number, BigNumber]> => {
   const activeProvider = provider()
   const LPTokenPoolContract = new Contract(poolAddress, UniswapV2PairABI, activeProvider)
   return Promise.all([
