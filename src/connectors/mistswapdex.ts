@@ -13,7 +13,8 @@ const MasterChefV2ABI = require('../abi/MasterChefV2.json')
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
 const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
 
-const MISTSWAP_LPTOKEN_DETAILS = require('../cache/mistswap/lptoken_details.json')
+const MISTSWAP_POOL_DETAILS = require('../cache/mistswap/pool_details.json')
+const MISTSWAP_TOKEN_DETAILS = require('../cache/mistswap/token_details.json')
 
 const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
 
@@ -26,9 +27,9 @@ const getTokenPriceInBenchmarkTokenFromLiquidityPool = async (tokenAddress: stri
 
   const [ balanceOfBenchmark, benchmarkDecimals, balanceOftoken, tokenDecimals ] = await Promise.all([
     benchmarkContract.balanceOf(liquidityPoolAddress),
-    benchmarkContract.decimals(),
+    benchmarkTokenAddress in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[benchmarkTokenAddress].decimals : benchmarkContract.decimals(),
     tokenContract.balanceOf(liquidityPoolAddress),
-    tokenContract.decimals(),
+    tokenAddress in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[tokenAddress].decimals : tokenContract.decimals(),
   ])
 
   return Number(utils.formatUnits(balanceOftoken, tokenDecimals)) / Number(utils.formatUnits(balanceOfBenchmark, benchmarkDecimals))
@@ -42,7 +43,7 @@ export const getTokenPriceFromPools = async (tokenAddress: string): Promise<numb
   }
   // Find the pools where the token is used
   // Object entries convert dict to list [[key, value], [key, value], ...]
-  const poolsWithToken: any[] = Object.entries(MISTSWAP_LPTOKEN_DETAILS).filter(([_poolAddress, pool]: [string, any]) => pool.token0 === tokenAddress || pool.token1 === tokenAddress)
+  const poolsWithToken: any[] = Object.entries(MISTSWAP_POOL_DETAILS).filter(([_poolAddress, pool]: [string, any]) => pool.token0 === tokenAddress || pool.token1 === tokenAddress)
   // Find if there is a pool with WBCH
   const poolWithWBCH: any[] = poolsWithToken.filter(([_poolAddress, pool]: [string, any]) => pool.token0 === WBCH_ADDRESS || pool.token1 === WBCH_ADDRESS)
   if (poolWithWBCH.length > 0) {
@@ -89,11 +90,11 @@ const getV2PairSummary = (poolAddress: string): Promise<[string, string, string,
   const LPTokenPoolContract = new Contract(poolAddress, UniswapV2PairABI, activeProvider)
   return Promise.all([
     // Use cache when possible
-    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].name : LPTokenPoolContract.name(),
-    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token0 : LPTokenPoolContract.token0(),
-    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].token1 : LPTokenPoolContract.token1(),
-    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].symbol : LPTokenPoolContract.symbol(),
-    poolAddress in MISTSWAP_LPTOKEN_DETAILS ? MISTSWAP_LPTOKEN_DETAILS[poolAddress].decimals : LPTokenPoolContract.decimals(),
+    poolAddress in MISTSWAP_POOL_DETAILS ? MISTSWAP_POOL_DETAILS[poolAddress].name : LPTokenPoolContract.name(),
+    poolAddress in MISTSWAP_POOL_DETAILS ? MISTSWAP_POOL_DETAILS[poolAddress].token0 : LPTokenPoolContract.token0(),
+    poolAddress in MISTSWAP_POOL_DETAILS ? MISTSWAP_POOL_DETAILS[poolAddress].token1 : LPTokenPoolContract.token1(),
+    poolAddress in MISTSWAP_POOL_DETAILS ? MISTSWAP_POOL_DETAILS[poolAddress].symbol : LPTokenPoolContract.symbol(),
+    poolAddress in MISTSWAP_POOL_DETAILS ? MISTSWAP_POOL_DETAILS[poolAddress].decimals : LPTokenPoolContract.decimals(),
     LPTokenPoolContract.totalSupply(),
   ])
 }
@@ -114,15 +115,15 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
       token0Name, token0Symbol, token0Decimals, token0Balance, token0Price,
       token1Name, token1Symbol, token1Decimals, token1Balance, token1Price,
     ] = await Promise.all([
-      Token0Contract.name(),
-      Token0Contract.symbol(),
-      Token0Contract.decimals(),
+      token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].name : Token0Contract.name(),
+      token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].symbol : Token0Contract.symbol(),
+      token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].decimals : Token0Contract.decimals(),
       Token0Contract.balanceOf(poolDetails.lpToken),
       getTokenPriceFromPools(token0),
 
-      Token1Contract.name(),
-      Token1Contract.symbol(),
-      Token1Contract.decimals(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].name : Token0Contract.name(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].symbol : Token0Contract.symbol(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].decimals : Token0Contract.decimals(),
       Token1Contract.balanceOf(poolDetails.lpToken),
       getTokenPriceFromPools(token1),
     ])
