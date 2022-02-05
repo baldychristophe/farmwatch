@@ -3,7 +3,7 @@ import { utils } from 'ethers'
 
 import { UncontrolledTooltip } from './UncontrolledTooltip'
 import { IExchange, IPool } from '../connectors/types'
-import { displayCurrency, displayNumber } from '../numberUtils'
+import { displayCurrency, displayNumber, displayPercentage } from '../numberUtils'
 
 export const Exchange = (props: { exchange: IExchange }) => {
   return (
@@ -55,6 +55,10 @@ export const Exchange = (props: { exchange: IExchange }) => {
                 <div className="text-sm">{ pool.poolName }</div>
                 <div className="text-sm">{ pool.token0.symbol } / { pool.token1.symbol }</div>
                 <div className="text-sm">{ displayCurrency(pool.token0.value + pool.token1.value) }</div>
+              </div>
+
+              <div className="self-start">
+                { displayPercentage(pool.roiPerYear) }
               </div>
             </div>
 

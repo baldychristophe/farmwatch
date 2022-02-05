@@ -1,5 +1,17 @@
 import { BigNumber } from "ethers";
 
+export type IPoolInfo = [
+  lpToken: string,
+  allocPoint: BigNumber,
+  lastRewardBloc: BigNumber,
+  accSushiPerShare: BigNumber,
+]
+
+export interface IPoolUserInfo {
+  amount: BigNumber,
+  rewardDebt: BigNumber,
+}
+
 export interface ITokenCompleteDetails {
   address: string,
   name: string,
@@ -17,16 +29,9 @@ export interface IPool {
   symbol: string,
   decimals: number,
   totalSupply: BigNumber,
-  poolUserInfo: {
-    amount: BigNumber,
-    rewardDebt: BigNumber,
-  },
-  poolDetails: {
-    lpToken: string,
-    allocPoint: BigNumber,
-    lastRewardBloc: BigNumber,
-    accSushiPerShare: BigNumber,
-  },
+  roiPerYear: number,
+  poolUserInfo: IPoolUserInfo,
+  poolDetails: IPoolInfo,
   token0: ITokenCompleteDetails,
   token1: ITokenCompleteDetails,
 }

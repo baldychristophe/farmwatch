@@ -5,7 +5,8 @@ import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
 
 import { getOrRefreshTokenPrice, getTokenPrice, setTokenPrice } from './store'
 import { WBCH_ADDRESS, MIST_ADDRESS } from './addresses'
-import { IExchange } from './types'
+import { BLOCKS_PER_DAY } from '../constants'
+import { IExchange, IPoolInfo } from './types'
 
 const BASE_LOGO_URL = 'https://assets.mistswap.fi/blockchains/smartbch/assets'
 
@@ -64,6 +65,18 @@ export const getTokenPriceFromPools = async (tokenAddress: string): Promise<numb
   return tokenPriceInUSD
 }
 
+const getTotalAllocPoint = async (): Promise<BigNumber> => {
+  const activeProvider = provider()
+  const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
+  return masterChefContract.totalAllocPoint()
+}
+
+const getSushiPerBlock = async (): Promise<BigNumber> => {
+  const activeProvider = provider()
+  const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
+  return masterChefContract.sushiPerBlock()
+}
+
 const getActivePools = async (userAddress: string): Promise<Array<{ poolUserInfo: { amount: BigNumber, rewardDebt: BigNumber }, index: number }>> => {
   const activeProvider = provider()
   const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
@@ -79,7 +92,7 @@ const getActivePools = async (userAddress: string): Promise<Array<{ poolUserInfo
   )
 }
 
-const getPoolDetails = (poolIndex: number) => {
+const getPoolDetails = (poolIndex: number): Promise<IPoolInfo> => { // type
   const activeProvider = provider()
   const masterChefContract = new Contract(MASTERCHEF_ADDRESS[ChainId.SMARTBCH], MasterChefV2ABI, activeProvider)
   return masterChefContract.poolInfo(poolIndex)
@@ -101,13 +114,17 @@ const getV2PairSummary = (poolAddress: string): Promise<[string, string, string,
 
 export const getMistSwapSummary = async (userAddress: string): Promise<IExchange> => {
   const activeProvider = provider()
-  const activePools = await getActivePools(userAddress)
-  // Launch and forget, do it early to hope it will be cached in the store when required later
-  const MistPricePromise = getOrRefreshTokenPrice(MIST_ADDRESS)
+
+  const [activePools, MistPrice, totalAllocPoint, sushiPerBlock] = await Promise.all([
+    getActivePools(userAddress),
+    getOrRefreshTokenPrice(MIST_ADDRESS),
+    getTotalAllocPoint(),
+    getSushiPerBlock(),
+  ])
 
   const activePoolsWithDetails = await Promise.all(activePools.map(async (pool) => {
     let poolDetails = await getPoolDetails(pool.index)
-    let [poolName, token0, token1, symbol, decimals, totalSupply] = await getV2PairSummary(poolDetails.lpToken)
+    let [poolName, token0, token1, symbol, decimals, totalSupply] = await getV2PairSummary(poolDetails[0])
 
     const Token0Contract = new Contract(token0, UniswapV2ERC20ABI, activeProvider)
     const Token1Contract = new Contract(token1, UniswapV2ERC20ABI, activeProvider)
@@ -118,15 +135,20 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
       token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].name : Token0Contract.name(),
       token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].symbol : Token0Contract.symbol(),
       token0 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token0].decimals : Token0Contract.decimals(),
-      Token0Contract.balanceOf(poolDetails.lpToken),
+      Token0Contract.balanceOf(poolDetails[0]),
       getTokenPriceFromPools(token0),
 
       token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].name : Token0Contract.name(),
       token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].symbol : Token0Contract.symbol(),
       token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].decimals : Token0Contract.decimals(),
-      Token1Contract.balanceOf(poolDetails.lpToken),
+      Token1Contract.balanceOf(poolDetails[0]),
       getTokenPriceFromPools(token1),
     ])
+
+    const rewardPerBlock = poolDetails[1].toNumber() / totalAllocPoint.toNumber() * Number(utils.formatUnits(sushiPerBlock, 18))
+    const TVL = Number(utils.formatUnits(token0Balance, token0Decimals)) * token0Price + Number(utils.formatUnits(token1Balance, token1Decimals)) * token1Price
+    const roiPerBlock = rewardPerBlock * MistPrice / TVL
+    const roiPerYear = roiPerBlock * BLOCKS_PER_DAY * 365
 
     return {
       poolUserInfo: pool.poolUserInfo,
@@ -136,6 +158,7 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
       symbol,
       totalSupply,
       decimals,
+      roiPerYear,
       token0: {
         address: token0,
         name: token0Name,
@@ -160,11 +183,11 @@ export const getMistSwapSummary = async (userAddress: string): Promise<IExchange
     }
   }))
   return {
-    name: 'Mistswap',
+    name: 'MISTswap',
     pools: activePoolsWithDetails,
     token: {
       name: 'MistToken',
-      price: await MistPricePromise, // retrieve the launch and forget
+      price: MistPrice,
       logoUrl: `${BASE_LOGO_URL}/${MIST_ADDRESS}/logo.png`,
     }
   }
