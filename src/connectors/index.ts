@@ -3,6 +3,7 @@ import { BigNumber, utils } from 'ethers'
 
 import { WBCH_ADDRESS } from './addresses'
 import { getMistSwapSummary } from './mistswapdex'
+import { getTangoSwapSummary } from './tangoswapdex'
 import { getOrRefreshTokenPrice } from './store'
 import { IPortfolioSummary } from './types'
 
@@ -23,10 +24,11 @@ const totalPoolsNetWorth = (pools: any): number => {
 }
 
 export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfolioSummary> => {
-  const [ userWalletBalance, BCHPrice, mistSwapSummary ] = await Promise.all([
+  const [ userWalletBalance, BCHPrice, mistSwapSummary, tangoSwapSummary ] = await Promise.all([
     getBalance(userAddress),
     getOrRefreshTokenPrice(WBCH_ADDRESS),
     getMistSwapSummary(userAddress),
+    getTangoSwapSummary(userAddress),
   ])
 
   const totalPools = totalPoolsNetWorth(mistSwapSummary.pools)
@@ -38,7 +40,7 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
   )
 
   return {
-    exchanges: [mistSwapSummary],
+    exchanges: [mistSwapSummary, tangoSwapSummary],
     balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
     BCHPrice: BCHPrice,
     netWorth: netWorth,

@@ -1,8 +1,8 @@
 import { getDefaultProvider, Contract, utils } from 'ethers'
 
 import {
-  WBCH_ADDRESS, FLEXUSD_ADDRESS, MIST_ADDRESS,
-  LPTOKEN_WBCH_FLEXUSD_ADDRESS, LPTOKEN_MIST_FLEXUSD_ADDRESS,
+  WBCH_ADDRESS, FLEXUSD_ADDRESS, MIST_ADDRESS, TANGO_ADDRESS,
+  LPTOKEN_WBCH_FLEXUSD_ADDRESS, LPTOKEN_MIST_FLEXUSD_ADDRESS, LPTOKEN_TANGO_FLEXUSD_ADDRESS,
 } from './addresses'
 
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
@@ -36,12 +36,28 @@ export const getMISTPriceUSD = async () => {
   return Number(utils.formatEther(balanceOfFlexUSD)) / Number(utils.formatEther(balanceOfMIST))
 }
 
+export const getTANGOPriceUSD = async () => {
+  const activeProvider = provider()
+  const TANGOContract = new Contract(TANGO_ADDRESS, UniswapV2ERC20ABI, activeProvider)
+  const FLEXUSDContract = new Contract(FLEXUSD_ADDRESS, UniswapV2ERC20ABI, activeProvider)
+
+  const [ balanceOfTANGO, balanceOfFlexUSD ] = await Promise.all([
+    TANGOContract.balanceOf(LPTOKEN_TANGO_FLEXUSD_ADDRESS),
+    FLEXUSDContract.balanceOf(LPTOKEN_TANGO_FLEXUSD_ADDRESS),
+  ])
+
+  return Number(utils.formatEther(balanceOfFlexUSD)) / Number(utils.formatEther(balanceOfTANGO))
+}
+
 export const getTokenPriceUSD = async (tokenAddress: string) => {
   if (tokenAddress === WBCH_ADDRESS) {
     const ret = await getBCHPriceUSD()
     return ret
   } else if (tokenAddress === MIST_ADDRESS) {
     const ret = await getMISTPriceUSD()
+    return ret
+  } else if (tokenAddress === TANGO_ADDRESS) {
+    const ret = await getTANGOPriceUSD()
     return ret
   } else if (tokenAddress === FLEXUSD_ADDRESS) {
     return 1

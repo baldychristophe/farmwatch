@@ -41,19 +41,19 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
               </UncontrolledTooltip>
             </div>
 
-            <div className="inline-block p-3 brightness-50 contrast-50">
-              {/* <a href="https://tangoswap.cash/smart-swap" target="_blank" rel="noreferrer"> */}
+            <div className="inline-block p-3">
+              <a href="https://tangoswap.cash/smart-swap" target="_blank" rel="noreferrer">
                 <img
                   id="tangoswap-logo-landing"
                   className="w-12 h-12 rounded-xl"
                   src="https://raw.githubusercontent.com/tangoswap-cash/assets/master/blockchains/smartbch/assets/0x73BE9c8Edf5e951c9a0762EA2b1DE8c8F38B5e91/logo.png"
                   alt="TANGOswap logo"
                 />
-              {/* </a> */}
+              </a>
               <UncontrolledTooltip target="tangoswap-logo-landing">
                 <div className="p-1 flex justify-center">
                   <span className="text-sm mr-1">TANGOswap</span>
-                  <span className="text-sm font-bold">Not supported yet</span>
+                  <span className="material-icons text-sm">launch</span>
                 </div>
               </UncontrolledTooltip>
             </div>
