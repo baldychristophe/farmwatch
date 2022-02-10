@@ -31,7 +31,7 @@ export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfo
     getTangoSwapSummary(userAddress),
   ])
 
-  const totalPools = totalPoolsNetWorth(mistSwapSummary.pools)
+  const totalPools = totalPoolsNetWorth(mistSwapSummary.pools) + totalPoolsNetWorth(tangoSwapSummary.pools)
 
   const netWorth = Number(
     totalPools
