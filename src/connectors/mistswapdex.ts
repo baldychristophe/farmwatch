@@ -1,25 +1,18 @@
-import { getDefaultProvider, Contract } from 'ethers'
+import { Contract } from 'ethers'
 import { BigNumber, utils } from 'ethers'
 
 import { ChainId, MASTERCHEF_ADDRESS } from '@mistswapdex/sdk'
 
 import { getOrRefreshTokenPrice, getTokenPrice, setTokenPrice } from './store'
-import { WBCH_ADDRESS, MIST_ADDRESS } from './constants'
-import { BLOCKS_PER_DAY } from '../constants'
+import {
+  WBCH_ADDRESS, MIST_ADDRESS,
+  provider, BLOCKS_PER_DAY,
+  UniswapV2ERC20ABI, MasterChefV2ABI, UniswapV2PairABI,
+  MISTSWAP_TOKEN_DETAILS, MISTSWAP_POOL_DETAILS
+} from './constants'
 import { IExchange, IPoolInfo } from './types'
 
 const BASE_LOGO_URL = 'https://assets.mistswap.fi/blockchains/smartbch/assets'
-
-const MasterChefV2ABI = require('../abi/MasterChefV2.json')
-const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
-const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
-
-const MISTSWAP_POOL_DETAILS = require('../cache/mistswap/pool_details.json')
-const MISTSWAP_TOKEN_DETAILS = require('../cache/mistswap/token_details.json')
-
-const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
-
-export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
 
 const getTokenPriceInBenchmarkTokenFromLiquidityPool = async (tokenAddress: string, benchmarkTokenAddress: string, liquidityPoolAddress: string): Promise<number> => {
   const activeProvider = provider()

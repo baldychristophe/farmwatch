@@ -1,15 +1,11 @@
-import { getDefaultProvider, Contract, utils } from 'ethers'
+import { Contract, utils } from 'ethers'
 
 import {
   WBCH_ADDRESS, FLEXUSD_ADDRESS, MIST_ADDRESS, TANGO_ADDRESS,
-  TOKEN_TO_FLEXUSD_POOL_ADDRESS,
+  TOKEN_TO_FLEXUSD_POOL_ADDRESS, provider,
 } from './constants'
 
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
-
-const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
-
-export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
 
 const getTokenPriceFromBenchmark = async (tokenAddress: string, benchmarkAddress: string): Promise<number> => {
   const activeProvider = provider()

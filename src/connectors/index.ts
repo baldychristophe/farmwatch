@@ -1,15 +1,12 @@
-import { getDefaultProvider } from 'ethers'
 import { BigNumber, utils } from 'ethers'
 
-import { WBCH_ADDRESS } from './constants'
+import { WBCH_ADDRESS, provider } from './constants'
 import { getMistSwapSummary } from './mistswapdex'
 import { getTangoSwapSummary } from './tangoswapdex'
 import { getOrRefreshTokenPrice } from './store'
 import { IPortfolioSummary } from './types'
 
-const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
 
-export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
 
 export const getBalance = (userAddress: string) : Promise<BigNumber> => {
   return provider().getBalance(userAddress)

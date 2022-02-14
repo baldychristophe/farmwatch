@@ -1,3 +1,16 @@
+import { getDefaultProvider } from 'ethers'
+
+export const BLOCKS_PER_DAY = 15700
+
+export const SMARTBCH_NODE_MAINNET = 'https://smartbch.fountainhead.cash/mainnet'
+export const provider = () => getDefaultProvider(SMARTBCH_NODE_MAINNET)
+
+export const MasterChefV2ABI = require('../abi/MasterChefV2.json')
+export const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
+export const UniswapV2PairABI = require('../abi/UniswapV2Pair.json')
+
+export const MISTSWAP_POOL_DETAILS = require('../cache/mistswap/pool_details.json')
+export const MISTSWAP_TOKEN_DETAILS = require('../cache/mistswap/token_details.json')
 
 export const WBCH_ADDRESS = '0x3743eC0673453E5009310C727Ba4eaF7b3a1cc04'
 export const FLEXUSD_ADDRESS = '0x7b2B3C5308ab5b2a1d9a94d20D35CCDf61e05b72'
