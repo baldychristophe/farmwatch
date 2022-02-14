@@ -131,9 +131,9 @@ export const getTangoSwapSummary = async (userAddress: string): Promise<IExchang
       Token0Contract.balanceOf(poolDetails[0]),
       getTokenPriceFromPools(token0),
 
-      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].name : Token0Contract.name(),
-      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].symbol : Token0Contract.symbol(),
-      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].decimals : Token0Contract.decimals(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].name : Token1Contract.name(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].symbol : Token1Contract.symbol(),
+      token1 in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[token1].decimals : Token1Contract.decimals(),
       Token1Contract.balanceOf(poolDetails[0]),
       getTokenPriceFromPools(token1),
     ])
