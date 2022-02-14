@@ -4,7 +4,7 @@ import { BigNumber, utils } from 'ethers'
 import { ChainId, MASTERCHEF_ADDRESS } from '@tangoswapcash/sdk'
 
 import { getOrRefreshTokenPrice, getTokenPrice, setTokenPrice } from './store'
-import { WBCH_ADDRESS, TANGO_ADDRESS } from './addresses'
+import { WBCH_ADDRESS, TANGO_ADDRESS } from './constants'
 import { BLOCKS_PER_DAY } from '../constants'
 import { IExchange, IPoolInfo } from './types'
 

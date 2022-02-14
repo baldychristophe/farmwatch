@@ -3,7 +3,7 @@ import { getDefaultProvider, Contract, utils } from 'ethers'
 import {
   WBCH_ADDRESS, FLEXUSD_ADDRESS, MIST_ADDRESS, TANGO_ADDRESS,
   TOKEN_TO_FLEXUSD_POOL_ADDRESS,
-} from './addresses'
+} from './constants'
 
 const UniswapV2ERC20ABI = require('../abi/UniswapV2ERC20.json')
 

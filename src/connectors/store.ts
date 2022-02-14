@@ -1,5 +1,5 @@
 import { getTokenPriceUSD } from './prices'
-import { FLEXUSD_ADDRESS } from './addresses'
+import { FLEXUSD_ADDRESS } from './constants'
 
 type TokenPriceRecord = Record<string, number>
 

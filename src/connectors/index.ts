@@ -1,7 +1,7 @@
 import { getDefaultProvider } from 'ethers'
 import { BigNumber, utils } from 'ethers'
 
-import { WBCH_ADDRESS } from './addresses'
+import { WBCH_ADDRESS } from './constants'
 import { getMistSwapSummary } from './mistswapdex'
 import { getTangoSwapSummary } from './tangoswapdex'
 import { getOrRefreshTokenPrice } from './store'
