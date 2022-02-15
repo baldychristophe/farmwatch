@@ -11,23 +11,9 @@ import {
   MISTSWAP_TOKEN_DETAILS, MISTSWAP_POOL_DETAILS
 } from './constants'
 import { IExchange, IPoolInfo } from './types'
+import { getTokenPriceInBenchmarkTokenFromLiquidityPool } from './prices'
 
 const BASE_LOGO_URL = 'https://raw.githubusercontent.com/tangoswap-cash/assets/master/blockchains/smartbch/assets'
-
-const getTokenPriceInBenchmarkTokenFromLiquidityPool = async (tokenAddress: string, benchmarkTokenAddress: string, liquidityPoolAddress: string): Promise<number> => {
-  const activeProvider = provider()
-  const benchmarkContract = new Contract(benchmarkTokenAddress, UniswapV2ERC20ABI, activeProvider)
-  const tokenContract = new Contract(tokenAddress, UniswapV2ERC20ABI, activeProvider)
-
-  const [ balanceOfBenchmark, benchmarkDecimals, balanceOftoken, tokenDecimals ] = await Promise.all([
-    benchmarkContract.balanceOf(liquidityPoolAddress),
-    benchmarkTokenAddress in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[benchmarkTokenAddress].decimals : benchmarkContract.decimals(),
-    tokenContract.balanceOf(liquidityPoolAddress),
-    tokenAddress in MISTSWAP_TOKEN_DETAILS ? MISTSWAP_TOKEN_DETAILS[tokenAddress].decimals : tokenContract.decimals(),
-  ])
-
-  return Number(utils.formatUnits(balanceOftoken, tokenDecimals)) / Number(utils.formatUnits(balanceOfBenchmark, benchmarkDecimals))
-}
 
 export const getTokenPriceFromPools = async (tokenAddress: string): Promise<number> => {
   // Check the store first
