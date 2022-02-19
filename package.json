@@ -2,6 +2,10 @@
   "name": "farmwatch",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "^16.13.1",
+    "npm": "^8.2.1"
+  },
   "resolutions": {
     "@walletconnect/web3-provider": "1.6.0"
   },
