@@ -20,7 +20,7 @@ This project's aim was to develop an application interacting with smart contract
 Landing page : *insert your wallet address*
 ![Landing page](screenshots/farmwatch_landing.png)
 
-Portofolio Summary
+Portofolio Summary : *This image is provided as an example of what can be displayed but does not represent real numbers*
 ![Portfolio summary](screenshots/farmwatch_portfolio.png)
 
 ## Usage
