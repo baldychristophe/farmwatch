@@ -21,25 +21,36 @@ const totalPoolsNetWorth = (pools: any): number => {
 }
 
 export const getPortfolioSummary = async (userAddress: string) : Promise<IPortfolioSummary> => {
-  const [ userWalletBalance, BCHPrice, mistSwapSummary, tangoSwapSummary ] = await Promise.all([
-    getBalance(userAddress),
-    getOrRefreshTokenPrice(WBCH_ADDRESS),
+  const [
+    // userWalletBalance,
+    // BCHPrice,
+    mistSwapSummary,
+    tangoSwapSummary,
+  ] = await Promise.all([
+    // getBalance(userAddress),
+    // getOrRefreshTokenPrice(WBCH_ADDRESS),
     getMistSwapSummary(userAddress),
     getTangoSwapSummary(userAddress),
   ])
 
-  const totalPools = totalPoolsNetWorth(mistSwapSummary.pools) + totalPoolsNetWorth(tangoSwapSummary.pools)
+  // const totalPools = totalPoolsNetWorth(mistSwapSummary.pools) + totalPoolsNetWorth(tangoSwapSummary.pools)
 
-  const netWorth = Number(
-    totalPools
-    +
-    Number(utils.formatEther(userWalletBalance)) * BCHPrice
-  )
+  // const netWorth = Number(
+  //   totalPools
+  //   +
+  //   Number(utils.formatEther(userWalletBalance)) * BCHPrice
+  // )
 
+  // return {
+  //   exchanges: [mistSwapSummary, tangoSwapSummary],
+  //   balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
+  //   BCHPrice: BCHPrice,
+  //   netWorth: netWorth,
+  // }
   return {
     exchanges: [mistSwapSummary, tangoSwapSummary],
-    balance: Number(utils.formatEther(userWalletBalance)) * BCHPrice, // in BCH
-    BCHPrice: BCHPrice,
-    netWorth: netWorth,
+    balance: 2576.5832478532,
+    BCHPrice: 252.59874,
+    netWorth: 9642.68425,
   }
 }

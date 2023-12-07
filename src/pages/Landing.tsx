@@ -109,23 +109,6 @@ export const Landing = (props: { setUserWalletAddress: Dispatch<SetStateAction<s
               </UncontrolledTooltip>
             </div>
 
-            <div className="inline-block p-3 brightness-50 contrast-50">
-              {/* <a href="https://www.tropical.finance/" target="_blank" rel="noreferrer"> */}
-                <img
-                  id="tropical-finance-logo-landing"
-                  className="w-12 h-12 rounded-xl"
-                  src="https://exchange.tropical.finance/images/coins/DAIQUIRI.png"
-                  alt="Tropical Finance logo"
-                />
-              {/* </a> */}
-              <UncontrolledTooltip target="tropical-finance-logo-landing">
-                <div className="p-1 flex justify-center">
-                  <span className="text-sm mr-1">Tropical Finance</span>
-                  <span className="text-sm font-bold">Not supported yet</span>
-                </div>
-              </UncontrolledTooltip>
-            </div>
-
           </div>
         </div>
       </div>

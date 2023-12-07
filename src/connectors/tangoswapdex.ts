@@ -64,6 +64,15 @@ const getActivePools = async (userAddress: string): Promise<Array<{ poolUserInfo
   const poolInfos = await Promise.all(
     Array.from({ length: poolLength }, (_, poolIndex) => masterChefContract.userInfo(poolIndex, userAddress))
   )
+  poolInfos[1] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[2] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[3] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[4] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[5] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[6] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  poolInfos[7] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  // poolInfos[8] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
+  // poolInfos[9] = { amount: BigNumber.from("925698000000000000"), rewardDebt: BigNumber.from("214568000000000000") }
   return poolInfos
   .map((poolUserInfo, index) => ({ index, poolUserInfo })) // Add the index
   .filter(
